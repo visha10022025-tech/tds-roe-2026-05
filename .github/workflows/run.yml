@@ -1,0 +1,36 @@
+name: Run task
+
+# workflow_dispatch lets us re-run without pushing; push covers the
+# "commit and it runs" style questions.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install toolchain
+        run: |
+          npm install playwright
+          npx playwright install --with-deps chromium
+          python3 -m pip install --quiet --upgrade pip
+          python3 -m pip install --quiet requests beautifulsoup4 lxml pandas numpy pillow duckdb
+
+      # The email must appear in a STEP NAME - several questions check exactly this.
+      - name: Run task - 24f3001062@ds.study.iitm.ac.in
+        run: bash run.sh
